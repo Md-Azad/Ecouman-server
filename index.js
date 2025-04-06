@@ -6,6 +6,7 @@ const cors = require("cors");
 const port = process.env.PORT || 3000;
 
 const userHandler = require("./RouteHandler/userHandler");
+const eventHandler = require("./RouteHandler/eventHandler");
 
 app.use(cors());
 app.use(express.json());
@@ -21,11 +22,12 @@ mongoose
   });
 
 //   routers
-app.get("/", async(req, res)=>{
-  res.send("your server is running.")
-})
+app.get("/", async (req, res) => {
+  res.send("your server is running.");
+});
 
 app.use("/users", userHandler);
+app.use("/events", eventHandler);
 
 app.listen(port, () => {
   console.log(`your server is running on : http://localhost:${port}`);
