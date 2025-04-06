@@ -4,11 +4,15 @@ const jwt = require("jsonwebtoken");
 const router = express.Router();
 const userSchema = require("../schemas/userSchema");
 const verifyToken = require("../middlewares/token");
+const verifyAdmin = require("../middlewares/verifyAdmin");
 
 const User = new mongoose.model("User", userSchema);
 
 router.post("/jwt", async (req, res) => {
-  const token = jwt.sign({ data: req.body }, "secret", { expiresIn: "1h" });
+  const token = jwt.sign({ data: req.body.user }, "secret", {
+    expiresIn: "1h",
+  });
+
   res.send(token);
 });
 
@@ -23,7 +27,7 @@ router.get("/:email", async (req, res) => {
 });
 
 // Get all users from user database.
-router.get("/", verifyToken, async (req, res) => {
+router.get("/", verifyToken, verifyAdmin, async (req, res) => {
   try {
     const user = await User.find();
 
