@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const router = express.Router();
 const userSchema = require("../schemas/userSchema");
+const verifyToken = require("../middlewares/token");
 
 const User = new mongoose.model("User", userSchema);
 
@@ -14,8 +15,6 @@ router.post("/jwt", async (req, res) => {
 // Get single user from user database.
 router.get("/:email", async (req, res) => {
   const email = req.params.email;
-  console.log(email);
-
   if (!email) {
     return res.status(400).json({ error: "Email is required" });
   }
@@ -24,7 +23,7 @@ router.get("/:email", async (req, res) => {
 });
 
 // Get all users from user database.
-router.get("/", async (req, res) => {
+router.get("/", verifyToken, async (req, res) => {
   try {
     const user = await User.find();
 
@@ -55,19 +54,22 @@ router.post("/", async (req, res) => {
 });
 
 // update an existing user in the database.
-router.put("/", async (req, res) => {
-  const email = req.query.email; // Now using req.query
-  const newRole = req.body?.role;
-  if (!email || !newRole) {
+router.put("/:email", async (req, res) => {
+  const email = req.params.email; // Now using req.query
+
+  const { role } = req.body;
+  console.log(role);
+  if (!email || !role) {
     return res.status(400).json({ error: "Email and new role are required" });
   }
 
   try {
     const updatedUser = await User.findOneAndUpdate(
       { email },
-      { role: newRole },
+      { role: role },
       { new: true } // return the updated document
     );
+    console.log("user after update", updatedUser);
 
     if (!updatedUser) {
       return res.status(404).json({ error: "User not found" });
