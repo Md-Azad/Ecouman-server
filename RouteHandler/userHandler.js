@@ -13,7 +13,8 @@ router.post("/jwt", async (req, res) => {
 
 // Get single user from user database.
 router.get("/:email", async (req, res) => {
-  const email = req.params.email; // ✅ Now using req.params.email
+  const email = req.params.email;
+  console.log(email);
 
   if (!email) {
     return res.status(400).json({ error: "Email is required" });
@@ -42,7 +43,7 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     const data = req.body;
-    console.log(data);
+
     const newUser = new User(data);
     const savedUser = await newUser.save(); // Wait for the save to complete
 
@@ -76,6 +77,40 @@ router.put("/", async (req, res) => {
   } catch (error) {
     console.error("Error updating user:", error);
     res.status(400).json({ error: error.message }); // Send error details
+  }
+
+  router.delete("/:email", async (req, res) => {
+    const email = req.params.email; // Now using req.query
+    console.log(email);
+    res.send(email);
+
+    // if (!email) {
+    //   return res.status(400).json({ error: "Email is required" });
+    // }
+
+    // User.findOneAndDelete({ email }, (err) => {
+    //   if (err) return res.status(400).json({ error: "User not found" });
+    //   res.json({ message: "User deleted successfully" });
+    // });
+  });
+});
+
+// delete user
+
+router.delete("/:email", async (req, res) => {
+  const email = req.params.email;
+
+  try {
+    const result = await User.deleteOne({ email: email });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json({ message: "User deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
