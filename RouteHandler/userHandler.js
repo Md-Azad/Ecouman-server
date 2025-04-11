@@ -1,12 +1,10 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
 const router = express.Router();
-const userSchema = require("../schemas/userSchema");
+const User = require("../schemas/userSchema");
 const verifyToken = require("../middlewares/token");
 const verifyAdmin = require("../middlewares/verifyAdmin");
-
-const User = new mongoose.model("User", userSchema);
 
 router.post("/jwt", async (req, res) => {
   const token = jwt.sign({ data: req.body.user }, "secret", {
@@ -46,6 +44,7 @@ router.get("/", verifyToken, verifyAdmin, async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     const data = req.body;
+    console.log(data);
 
     const newUser = new User(data);
     const savedUser = await newUser.save(); // Wait for the save to complete
@@ -62,7 +61,7 @@ router.put("/:email", async (req, res) => {
   const email = req.params.email; // Now using req.query
 
   const { role } = req.body;
-  console.log(role);
+
   if (!email || !role) {
     return res.status(400).json({ error: "Email and new role are required" });
   }

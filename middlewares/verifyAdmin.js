@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
-const userSchema = require("../schemas/userSchema");
-const User = new mongoose.model("User", userSchema);
+const User = require("../schemas/userSchema");
 
 const verifyAdmin = async (req, res, next) => {
   console.log("email from request: ", email);

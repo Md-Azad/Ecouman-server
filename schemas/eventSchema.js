@@ -4,8 +4,13 @@ const eventSchema = mongoose.Schema({
   eventName: {
     type: String,
     required: true,
+    unique: true,
   },
   eventLocation: {
+    type: String,
+    required: true,
+  },
+  description: {
     type: String,
     required: true,
   },
@@ -21,10 +26,24 @@ const eventSchema = mongoose.Schema({
     type: Number,
     required: true,
   },
+  donationCollected: {
+    type: Number,
+    default: 0,
+  },
   volunteerNeed: {
     type: Number,
     required: true,
   },
+  volunteerGot: {
+    type: Number,
+    default: 0,
+  },
+  createdBy: {
+    type: String,
+    required: true,
+  },
 });
 
-module.exports = eventSchema;
+const Event = new mongoose.model("Event", eventSchema);
+
+module.exports = Event;
