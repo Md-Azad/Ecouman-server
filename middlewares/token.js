@@ -2,9 +2,8 @@ const jwt = require("jsonwebtoken");
 const verifyToken = (req, res, next) => {
   const bearerToken = req.headers.authorization;
 
-  console.log(bearerToken);
   if (!bearerToken) {
-    res.status(403).send({ message: "Unauthorized Access" });
+    return res.status(403).send({ message: "Unauthorized Access(one)" });
   }
   const token = req.headers.authorization.split(" ")[1];
   jwt.verify(token, "secret", (err, decoded) => {
@@ -12,7 +11,7 @@ const verifyToken = (req, res, next) => {
       if (err.name === "TokenExpiredError") {
         return res.status(401).send({ message: "Token Expired" });
       }
-      res.status(403).send({ message: "Unauthorized Access" });
+      return res.status(403).send({ message: "Unauthorized Access(two)" });
     }
     req.decoded = decoded;
 

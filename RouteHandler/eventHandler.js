@@ -7,13 +7,13 @@ const Event = require("../schemas/eventSchema");
 router.post("/", async (req, res) => {
   try {
     const data = req.body;
-    console.log(data);
-
     const newEvent = new Event(data);
+
     const result = await newEvent.save();
+
     res.send(result);
   } catch (error) {
-    res.send(error);
+    return res.send(error);
   }
 });
 
@@ -39,10 +39,9 @@ router.get("/:id", async (req, res) => {
 });
 
 // update an Event
-
 router.patch("/:id", async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id;
     const {
       createdBy,
       eventName,
@@ -53,9 +52,10 @@ router.patch("/:id", async (req, res) => {
       eventPhoto,
       description,
     } = req.body;
-    const result = await Event.findOne({ _id: id });
-    if (createdBy !== result?.createdBy) {
-      res.send("you are not the creator of this event.");
+    const findEvent = await Event.findOne({ _id: id });
+
+    if (createdBy !== findEvent.createdBy) {
+      return res.send({ message: "You do not own any events" });
     } else {
       const updatedEvent = await Event.findOneAndUpdate(
         { _id: id },
@@ -72,12 +72,29 @@ router.patch("/:id", async (req, res) => {
         { new: true }
       );
       if (!updatedEvent) {
-        return res.status(404).json({ error: "Updating failed" });
+        return res.send({ message: "updating failed" });
+      } else {
+        return res.send(updatedEvent);
       }
-      res.status(202).send(updatedEvent);
     }
   } catch (error) {
-    res.send(error);
+    return res.send({ message: `something went wrong, ${error}` });
+  }
+});
+
+router.delete("/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const result = await Event.deleteOne({ _id: id });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ error: "Event not found" });
+    }
+
+    res.status(200).json({ message: "Event deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting Event:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 

@@ -14,9 +14,26 @@ router.post("/jwt", async (req, res) => {
   res.send(token);
 });
 
+// Get all users from user database.
+router.get("/allUser/:email", verifyToken, verifyAdmin, async (req, res) => {
+  try {
+    const users = await User.find();
+
+    if (!users) {
+      return res.status(404).json({ error: "Users not found" });
+    }
+
+    res.status(200).json(users);
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Get single user from user database.
-router.get("/:email", async (req, res) => {
+router.get("/singleuser/:email", async (req, res) => {
   const email = req.params.email;
+
   if (!email) {
     return res.status(400).json({ error: "Email is required" });
   }
@@ -24,27 +41,10 @@ router.get("/:email", async (req, res) => {
   res.json(user);
 });
 
-// Get all users from user database.
-router.get("/", verifyToken, verifyAdmin, async (req, res) => {
-  try {
-    const user = await User.find();
-
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    res.status(200).json(user);
-  } catch (error) {
-    console.error("Error fetching user:", error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
 // save a new user to the database.
 router.post("/", async (req, res) => {
   try {
     const data = req.body;
-    console.log(data);
 
     const newUser = new User(data);
     const savedUser = await newUser.save(); // Wait for the save to complete
@@ -72,7 +72,6 @@ router.put("/:email", async (req, res) => {
       { role: role },
       { new: true } // return the updated document
     );
-    console.log("user after update", updatedUser);
 
     if (!updatedUser) {
       return res.status(404).json({ error: "User not found" });
@@ -83,21 +82,6 @@ router.put("/:email", async (req, res) => {
     console.error("Error updating user:", error);
     res.status(400).json({ error: error.message }); // Send error details
   }
-
-  router.delete("/:email", async (req, res) => {
-    const email = req.params.email; // Now using req.query
-    console.log(email);
-    res.send(email);
-
-    // if (!email) {
-    //   return res.status(400).json({ error: "Email is required" });
-    // }
-
-    // User.findOneAndDelete({ email }, (err) => {
-    //   if (err) return res.status(400).json({ error: "User not found" });
-    //   res.json({ message: "User deleted successfully" });
-    // });
-  });
 });
 
 // delete user

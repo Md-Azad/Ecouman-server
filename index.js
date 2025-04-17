@@ -7,19 +7,14 @@ const port = process.env.PORT || 3000;
 
 const userHandler = require("./RouteHandler/userHandler");
 const eventHandler = require("./RouteHandler/eventHandler");
+const dbConnect = require("./db/dbConnect");
 
 app.use(cors());
 app.use(express.json());
 
-// Database connection
-mongoose
-  .connect(process.env.url)
-  .then(() => {
-    console.log("database connected successfull");
-  })
-  .catch((err) => {
-    console.log(err);
-  });
+//  Database connection
+
+dbConnect();
 
 //   routers
 app.get("/", async (req, res) => {

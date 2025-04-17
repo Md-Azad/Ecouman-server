@@ -1,9 +1,7 @@
-const mongoose = require("mongoose");
 const User = require("../schemas/userSchema");
 
 const verifyAdmin = async (req, res, next) => {
-  console.log("email from request: ", email);
-  const query = { email: email };
+  const query = { email: req.params.email };
   const result = await User.findOne(query);
 
   const isAdmin = result?.role === "admin";
